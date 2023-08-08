@@ -304,3 +304,4 @@ resource "aws_lb" "florida-LB-1" {
     Environment = "production"
   }
 }
+
