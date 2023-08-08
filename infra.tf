@@ -7,6 +7,15 @@ terraform {
   }
 }
 
+terraform {
+  backend "s3" {
+    bucket = "terraform-file-8th-aug"
+    key    = "terraform-Infra-file.tf"
+    region = "us-east-2"
+  }
+}
+
+
 #  Configure the AWS Provider
 provider "aws" {
   region = "us-east-2"
@@ -70,7 +79,7 @@ resource "aws_subnet" "florida-subnet-2c" {
 # creating the ec2 instances
 resource "aws_instance" "florida-instace" {
   ami                    = "ami-07f7a72f74cc6ead3"
-  instance_type          = "t2.micro"
+  instance_type          = var.florida_instance_type
   key_name               = aws_key_pair.florida-key-pair.id
   subnet_id              = aws_subnet.florida-subnet-2a.id
   vpc_security_group_ids = [aws_security_group.florida_SG_allow_ssh_http.id]
@@ -218,9 +227,9 @@ resource "aws_lb" "florida-LB" {
 resource "aws_launch_template" "florida-LT" {
   name = "florida-LT"
 
-  image_id = "ami-024e6efaf93d85776"
+  image_id      = "ami-024e6efaf93d85776"
   instance_type = "t2.micro"
-  key_name = aws_key_pair.florida-key-pair.id
+  key_name      = aws_key_pair.florida-key-pair.id
 
   monitoring {
     enabled = true
@@ -246,12 +255,12 @@ resource "aws_launch_template" "florida-LT" {
 #Creating ASG
 resource "aws_autoscaling_group" "florida-ASG" {
   vpc_zone_identifier = [aws_subnet.florida-subnet-2a.id, aws_subnet.florida-subnet-2b.id]
-  
-  desired_capacity   = 2
-  max_size           = 5
-  min_size           = 2
 
-  
+  desired_capacity = 2
+  max_size         = 5
+  min_size         = 2
+
+
   launch_template {
     id      = aws_launch_template.florida-LT.id
     version = "$Latest"
@@ -274,7 +283,7 @@ resource "aws_lb_listener" "florida-listener-1" {
   load_balancer_arn = aws_lb.florida-LB-1.arn
   port              = "80"
   protocol          = "HTTP"
- 
+
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.florida-TG-1.arn
