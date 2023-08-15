@@ -93,7 +93,7 @@ resource "aws_instance" "florida-instace-2" {
   ami                    = "ami-07f7a72f74cc6ead3"
   instance_type          = "t2.micro"
   key_name               = aws_key_pair.florida-key-pair.id
-  subnet_id              = aws_subnet.florida-subnet-2a.id
+  subnet_id              = aws_subnet.florida-subnet-2b.id
   vpc_security_group_ids = [aws_security_group.florida_SG_allow_ssh_http.id]
 
   tags = {
